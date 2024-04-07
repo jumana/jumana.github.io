@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Picker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            display: inline-block;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAHdusCALTUrvxwt3G5pnYe6DmXgfbjzQc&callback=initMap&libraries=&v=weekly" async defer></script>
+    <script>
+        let map, marker;
+
+        function initMap() {
+            const initialPosition = { lat: 51.752, lng: -1.258 };
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 8,
+                center: initialPosition,
+            });
+
+            map.addListener("click", (e) => {
+                placeMarkerAndPanTo(e.latLng, map);
+            });
+        }
+
+        function placeMarkerAndPanTo(latLng, map) {
+            if (marker) {
+                marker.setPosition(latLng);
+            } else {
+                marker = new google.maps.Marker({
+                    position: latLng,
+                    map: map,
+                });
+            }
+            document.getElementById("pinLocation").value = `Lat: ${latLng.lat()}, Lng: ${latLng.lng()}`;
+            map.panTo(latLng);
+        }
+
+        async function copyToClipboard() {
+            const copyText = document.getElementById("pinLocation").value;
+            try {
+                await navigator.clipboard.writeText(copyText);
+                alert('Location copied to clipboard');
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+            }
+        }
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <h2>Map Picker</h2>
+    <div id="map"></div>
+    <textarea id="pinLocation" rows="2" readonly></textarea>
+    <button onclick="copyToClipboard()">Copy Location</button>
+</div>
+
+</body>
+</html>
